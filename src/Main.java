@@ -13,10 +13,14 @@ public class Main {
 		CmmLexer lexer = new CmmLexer(input);
 
 		// create a parser that feeds off the tokens buffer
-		CommonTokenStream tokens = new CommonTokenStream(lexer); 
-		CmmParser parser = new CmmParser(tokens);	
-		parser.program();		
-	}
-	
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken()) {
+			System.out.println(token);
+		}
+		CmmParser parser = new CmmParser(tokens);
 
+		CmmParser.ProgramContext tree = parser.program();
+
+		System.out.println(tree.toStringTree(parser));
+	}
 }
