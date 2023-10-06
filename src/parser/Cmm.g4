@@ -5,10 +5,12 @@ grammar Cmm;
 // 'program' is the start rule for this grammar, it comprises zero or more
 // declarations (var, function, struct) followed by exactly one main function.
 program : (varDeclaration | functionDeclaration | structDeclaration)* mainFunction EOF;
+varDeclaration : type arrayDimensions ID SEMI | type idList SEMI;
 
 // Variable declarations can be for arrays or id lists, followed by a semicolon.
-varDeclaration : type (arrayVarDecl | idList) SEMI;
-arrayVarDecl : arrayDimensions ID;
+//varDeclaration : type arrayVarDecl SEMI | type idList SEMI;
+
+
 idList : ID (COMMA ID)*;
 arrayDimensions : (LBRACKET INT_CONSTANT RBRACKET)+;  // Array dimensions support multi-dimensional arrays.
 
@@ -53,7 +55,7 @@ functionCall : ID LPAREN exprList? RPAREN;
 
 // Expressions can be literals, IDs, function calls, or operations.
 expr : INT_CONSTANT
-     | REAL_CONSTANT
+     | DOUBLE_CONSTANT
      | CHAR_CONSTANT
      | ID
      | functionCall
@@ -83,7 +85,7 @@ param : type ID;
 
 // Types define the data type of a variable or return type of a function.
 type : INT
-     | REAL
+     | DOUBLE
      | CHAR
      | VOID
      | ID  // This allows custom types like structs.
@@ -104,6 +106,12 @@ WHILE : 'while';
 VOID : 'void';
 MAIN : 'main';  // 'main' function identifier.
 WRITE : 'write';
+STRUCT : 'struct';
+INT : 'int';
+DOUBLE : 'double';
+CHAR : 'char';
+READ : 'read';
+RETURN : 'return';
 
 ASSIGN : '=';
 LBRACE : '{';
@@ -130,23 +138,17 @@ OR : '||';
 NOT : '!';
 DOT : '.';
 
-// Identifier (variable, function, struct names, etc.).
 ID : [a-zA-Z_] [a-zA-Z_0-9]* ;
 
 // Various literals and a fragment for escape sequences.
 CHAR_CONSTANT : '\'' ( ESCAPE_SEQUENCE | ~('\'' | '\\') ) '\'';
 fragment ESCAPE_SEQUENCE : '\\' ('n' | 't' | 'b' | 'r' | '\'' | '\\') | '\\' [0-7] [0-7]? [0-7]?;
-REAL_CONSTANT : [0-9]+ '.' [0-9]* EXPONENT? | '.' [0-9]+ EXPONENT? | [0-9]+ EXPONENT;
+DOUBLE_CONSTANT : [0-9]+ '.' [0-9]* EXPONENT? | '.' [0-9]+ EXPONENT? | [0-9]+ EXPONENT;
 fragment EXPONENT : [eE] [+-]? [0-9]+;
 INT_CONSTANT : '0' | [1-9][0-9]* ;
 
 // More keywords.
-STRUCT : 'struct';
-INT : 'int';
-REAL : 'real';
-CHAR : 'char';
-READ : 'read';
-RETURN : 'return';
+
 
 // Operators and Separators.
 

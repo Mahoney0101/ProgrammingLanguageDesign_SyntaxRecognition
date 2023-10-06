@@ -14,15 +14,39 @@ public class Main {
 
 		// create a parser that feeds off the tokens buffer
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken()) {
-			System.out.println(token);
-		}
-		tokens.reset(); // Reset the token stream.
+
 
 		CmmParser parser = new CmmParser(tokens);
 		CmmParser.ProgramContext tree = parser.program();
 
 
 		System.out.println(tree.toStringTree(parser));
+		//parser.program();
+//		Token token;
+//		while ((token = lexer.nextToken()).getType() != CmmLexer.EOF) {
+//			// We get the semantic value of the token
+//			Object semanticValue = null;
+//			switch (token.getType()) {
+//				// TODO: Implement the lexemeToChar and lexemeToReal methods in LexerHelper
+//				case CmmLexer.CHAR_CONSTANT:
+//					semanticValue = LexerHelper.lexemeToChar(token.getText());
+//					break;
+//				case CmmLexer.DOUBLE_CONSTANT:
+//					semanticValue = LexerHelper.lexemeToReal(token.getText());
+//					break;
+//
+//				case CmmLexer.INT_CONSTANT:
+//					semanticValue = LexerHelper.lexemeToInt(token.getText());
+//					break;
+//				default:
+//					semanticValue = token.getText();
+//			}
+//			// We show the token information
+//			System.out.printf("Line: %d, column: %d, lexeme: '%s', token: %s, semantic value: %s.\n",
+//					token.getLine(), token.getCharPositionInLine() + 1,
+//					token.getText(), lexer.getVocabulary()
+//							.getDisplayName(token.getType()),
+//					semanticValue);
+//		}
 	}
 }

@@ -23,12 +23,6 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVarDeclaration(CmmParser.VarDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link CmmParser#arrayVarDecl}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArrayVarDecl(CmmParser.ArrayVarDeclContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link CmmParser#idList}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

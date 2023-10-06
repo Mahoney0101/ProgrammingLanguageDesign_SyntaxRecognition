@@ -28,16 +28,6 @@ public interface CmmListener extends ParseTreeListener {
 	 */
 	void exitVarDeclaration(CmmParser.VarDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CmmParser#arrayVarDecl}.
-	 * @param ctx the parse tree
-	 */
-	void enterArrayVarDecl(CmmParser.ArrayVarDeclContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link CmmParser#arrayVarDecl}.
-	 * @param ctx the parse tree
-	 */
-	void exitArrayVarDecl(CmmParser.ArrayVarDeclContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link CmmParser#idList}.
 	 * @param ctx the parse tree
 	 */
