@@ -17,9 +17,11 @@ public class Main {
 		for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken()) {
 			System.out.println(token);
 		}
-		CmmParser parser = new CmmParser(tokens);
+		tokens.reset(); // Reset the token stream.
 
+		CmmParser parser = new CmmParser(tokens);
 		CmmParser.ProgramContext tree = parser.program();
+
 
 		System.out.println(tree.toStringTree(parser));
 	}

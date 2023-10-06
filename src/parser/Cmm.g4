@@ -105,6 +105,31 @@ VOID : 'void';
 MAIN : 'main';  // 'main' function identifier.
 WRITE : 'write';
 
+ASSIGN : '=';
+LBRACE : '{';
+RBRACE : '}';
+LPAREN : '(';
+RPAREN : ')';
+LBRACKET : '[';
+RBRACKET : ']';
+SEMI : ';';
+COMMA : ',';
+ADD : '+';
+SUB : '-';
+MUL : '*';
+DIV : '/';
+MOD : '%';
+GT : '>';
+GTE : '>=';
+LT : '<';
+LTE : '<=';
+NEQ : '!=';
+EQ : '==';
+AND : '&&';
+OR : '||';
+NOT : '!';
+DOT : '.';
+
 // Identifier (variable, function, struct names, etc.).
 ID : [a-zA-Z_] [a-zA-Z_0-9]* ;
 
@@ -124,27 +149,4 @@ READ : 'read';
 RETURN : 'return';
 
 // Operators and Separators.
-LBRACE : '{';
-RBRACE : '}';
-LPAREN : '(';
-RPAREN : ')';
-LBRACKET : '[';
-RBRACKET : ']';
-SEMI : ';';
-COMMA : ',';
-ASSIGN : '=';
-ADD : '+';
-SUB : '-';
-MUL : '*';
-DIV : '/';
-MOD : '%';
-GT : '>';
-GTE : '>=';
-LT : '<';
-LTE : '<=';
-NEQ : '!=';
-EQ : '==';
-AND : '&&';
-OR : '||';
-NOT : '!';
-DOT : '.';
+
