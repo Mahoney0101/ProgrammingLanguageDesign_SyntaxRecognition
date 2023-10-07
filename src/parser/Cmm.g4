@@ -2,38 +2,23 @@ grammar Cmm;
 
 // ** PARSER RULES **
 
-// 'program' is the start rule for this grammar, it comprises zero or more
-// declarations (var, function, struct) followed by exactly one main function.
+// ** Program Structure **
 program : (varDeclaration | functionDeclaration | structDeclaration)* mainFunction EOF;
-varDeclaration : type arrayDimensions ID SEMI | type idList SEMI;
-
-// Variable declarations can be for arrays or id lists, followed by a semicolon.
-//varDeclaration : type arrayVarDecl SEMI | type idList SEMI;
-
-
-idList : ID (COMMA ID)*;
-arrayDimensions : (LBRACKET INT_CONSTANT RBRACKET)+;  // Array dimensions support multi-dimensional arrays.
-
-// Function declarations have a return type, identifier, optional parameters, and a block of code.
-functionDeclaration : type ID LPAREN paramList? RPAREN block;
-// The 'main' function does not take parameters and returns void.
 mainFunction : VOID MAIN LPAREN RPAREN block;
 
-// Struct declarations have a name and one or more field declarations.
-structDeclaration : STRUCT LBRACE fieldDeclaration+ RBRACE ID SEMI;
-fieldDeclaration : type ID (LBRACKET INT_CONSTANT RBRACKET)* SEMI  // Fields can also be arrays.
-                 | structDeclaration  // This allows nested structs.
-                 ;
+// ** Declarations **
 
-// Blocks contain zero or more statements or variable declarations.
-block : LBRACE blockStatement* RBRACE
-      | statement
-      ;
-blockStatement : varDeclaration
-               | statement
-               ;
+varDeclaration : (type | structTypeDeclaration) arrayDimensions? idList SEMI;
 
-// Statements define the various actions that can be performed in the language.
+
+fieldDeclaration : (type arrayDimensions? | structTypeDeclaration arrayDimensions?) idList SEMI;
+
+structTypeDeclaration : STRUCT ID? LBRACE fieldDeclaration+ RBRACE ;
+
+structDeclaration : STRUCT LBRACE fieldDeclaration+ RBRACE arrayDimensions? ID SEMI;
+functionDeclaration : type ID LPAREN paramList? RPAREN block;
+
+// ** Statements and Blocks **
 statement : varDeclaration
           | assignment
           | ifStatement
@@ -44,62 +29,74 @@ statement : varDeclaration
           | functionCall SEMI
           ;
 
-// Definitions of various types of statements.
+block : LBRACE blockStatement* RBRACE
+      | statement
+      ;
+
+blockStatement : varDeclaration
+               | statement
+               ;
+
+// ** Specific Statement Types **
 ifStatement : IF LPAREN expr RPAREN block (ELSE block)?;
 assignment : expr ASSIGN expr SEMI;
 whileStatement : WHILE LPAREN expr RPAREN block;
 returnStatement : RETURN expr SEMI;
 writeStatement : WRITE exprList SEMI;
 readStatement : READ exprList SEMI;
-functionCall : ID LPAREN exprList? RPAREN;
 
-// Expressions can be literals, IDs, function calls, or operations.
-expr : INT_CONSTANT
-     | DOUBLE_CONSTANT
-     | CHAR_CONSTANT
-     | ID
-     | functionCall
-     | ID DOT ID  // Struct field access
-     | LPAREN expr RPAREN
-     | NOT expr
-     | LPAREN type RPAREN expr  // Type casting
-     | expr MUL expr
-     | expr DIV expr
-     | expr MOD expr
-     | expr ADD expr
-     | expr SUB expr
-     | expr LT expr
-     | expr LTE expr
-     | expr GT expr
-     | expr GTE expr
-     | expr EQ expr
-     | expr NEQ expr
-     | expr AND expr
-     | expr OR expr
-     | expr LBRACKET expr RBRACKET  // Array indexing
+// ** Expressions and Types **
+expr : expr OR expr            // orExpr
+     | expr AND expr           // andExpr
+     | expr EQ expr            // eqExpr
+     | expr NEQ expr           // neqExpr
+     | expr LTE expr           // lteExpr
+     | expr LT expr            // ltExpr
+     | expr GTE expr           // gteExpr
+     | expr GT expr            // gtExpr
+     | expr ADD expr           // addExpr
+     | expr SUB expr           // subExpr
+     | expr MUL expr           // mulExpr
+     | expr DIV expr           // divExpr
+     | expr MOD expr           // modExpr
+     | SUB expr                // unaryMinusExpr
+     | NOT expr                // notExpr
+     | LPAREN expr RPAREN      // parenExpr
+     | INT_CONSTANT            // intConst
+     | DOUBLE_CONSTANT         // doubleConst
+     | CHAR_CONSTANT           // charConst
+     | ID                      // idExpr
+     | functionCall            // functionCallExpr
+     | ID DOT ID               // structFieldAccess
+     | expr LBRACKET expr RBRACKET  // arrayIndexing
+     | expr DOT ID              // nestedStructFieldAccess
+     | LPAREN type RPAREN expr // typeCast
      ;
 
 exprList : expr (COMMA expr)*;
 paramList : param (COMMA param)*;
 param : type ID;
 
-// Types define the data type of a variable or return type of a function.
-type : INT
-     | DOUBLE
-     | CHAR
-     | VOID
-     | ID  // This allows custom types like structs.
+type : baseType
+     | ID
      ;
 
+baseType : INT
+         | DOUBLE
+         | CHAR
+         | VOID
+         ;
+
+// ** Variable and Function Handling **
+idList : (ID arrayDimensions?)(COMMA ID arrayDimensions?)*;
+
+arrayDimensions : (LBRACKET INT_CONSTANT RBRACKET)+;
+
+functionCall : ID LPAREN exprList? RPAREN;
 
 // ** LEXER RULES **
 
-// Ignoring whitespace and comments.
-ONE_LINE_COMMENT : '//' ~('\n')* -> skip ;
-MULTI_LINE_COMMENT : '/*' .*? '*/' -> skip ;
-WS : [ \t\r\n]+ -> skip ;
-
-// Keywords and special function names.
+// ** Keywords and Special Symbols **
 IF : 'if';
 ELSE : 'else';
 WHILE : 'while';
@@ -138,17 +135,17 @@ OR : '||';
 NOT : '!';
 DOT : '.';
 
+// ** Identifiers and Literals **
 ID : [a-zA-Z_] [a-zA-Z_0-9]* ;
-
-// Various literals and a fragment for escape sequences.
 CHAR_CONSTANT : '\'' ( ESCAPE_SEQUENCE | ~('\'' | '\\') ) '\'';
-fragment ESCAPE_SEQUENCE : '\\' ('n' | 't' | 'b' | 'r' | '\'' | '\\') | '\\' [0-7] [0-7]? [0-7]?;
 DOUBLE_CONSTANT : [0-9]+ '.' [0-9]* EXPONENT? | '.' [0-9]+ EXPONENT? | [0-9]+ EXPONENT;
-fragment EXPONENT : [eE] [+-]? [0-9]+;
 INT_CONSTANT : '0' | [1-9][0-9]* ;
 
-// More keywords.
+fragment ESCAPE_SEQUENCE : '\\' ('n' | 't' | 'b' | 'r' | '\'' | '\\') | '\\' [0-7] [0-7]? [0-7]?;
+fragment EXPONENT : [eE] [+-]? [0-9]+;
 
-
-// Operators and Separators.
+// ** Comments and Whitespace **
+ONE_LINE_COMMENT : '//' ~('\n')* -> skip ;
+MULTI_LINE_COMMENT : '/*' .*? '*/' -> skip ;
+WS : [ \t\r\n]+ -> skip ;
 
